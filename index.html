@@ -32,17 +32,21 @@
 
         .form-group {
             margin-bottom: 20px;
-            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
             padding: 15px;
             border-radius: 12px;
             display: flex;
-            align-items: center;
-            justify-content: space-between;
+            flex-direction: column;
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
         .form-group select, .form-group input {
-            width: 60%;
+            width: 100%;
             padding: 8px;
             font-size: 16px;
             border: none;
@@ -50,13 +54,8 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
-        .form-group .label-icon {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-
         .item {
-            background: linear-gradient(135deg, #81ecec, #63cdda);
+            background: #f4f4f4;
             padding: 15px;
             border-radius: 12px;
             display: flex;
@@ -64,10 +63,18 @@
             justify-content: space-between;
             margin-bottom: 10px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
         }
 
-        .item .item-icon {
-            font-size: 24px;
+        .item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .item img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
             margin-right: 10px;
         }
 
@@ -94,83 +101,105 @@
             border-radius: 8px;
             cursor: pointer;
             text-transform: uppercase;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         button:hover {
-            background: linear-gradient(135deg, #ff6f61, #ffc048);
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        #invoice-summary {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Mini Bar Management</h1>
+        
+        <!-- Formuláře nahoře -->
         <div class="form-group">
-            <span class="label-icon">🏡</span>
+            <label for="villa">Vyberte vilu:</label>
             <select id="villa">
-                <option value="ohyeah">Oh Yeah Villa</option>
-                <option value="castle">The Little Castle</option>
-                <option value="pool">Amazing Pool Villa</option>
+                <option value="ohyeah">🏠 Oh Yeah Villa</option>
+                <option value="castle">🏰 The Little Castle</option>
+                <option value="pool">🏊 Amazing Pool Villa</option>
             </select>
         </div>
+
         <div class="form-group">
-            <span class="label-icon">💰</span>
+            <label for="currency">Vyberte měnu:</label>
             <select id="currency">
                 <option value="CZK">CZK</option>
                 <option value="EUR">EUR</option>
             </select>
         </div>
+
         <div class="form-group">
-            <span class="label-icon">🛁</span>
-            <input type="number" id="wellness" placeholder="Zadejte částku (€)">
+            <label for="wellness">Wellness (€):</label>
+            <input type="number" id="wellness" placeholder="Zadejte částku">
         </div>
+
         <div class="form-group">
-            <span class="label-icon">🌆</span>
+            <label for="guests">Počet hostů:</label>
             <input type="number" id="guests" placeholder="Počet hostů">
         </div>
-        <div class="form-group">
-            <span class="label-icon">🛏️</span>
-            <input type="number" id="nights" placeholder="Počet nocí">
-        </div>
+
+        <!-- Položky minibaru -->
         <div id="items"></div>
+
+        <!-- Shrnutí a tlačítka -->
+        <div id="invoice-summary">Celková cena: 0 CZK</div>
         <button onclick="generateInvoice()">Generovat fakturu</button>
-        <button onclick="window.location.href='sklad.html'">Přejít do skladu</button>
-        <button onclick="window.location.href='statistiky.html'">Přejít na statistiky</button>
     </div>
+
     <script>
+        // Položky minibaru
         const sklad = {
-            "Budvar": { price: 59, icon: "🍺", stock: 50, currency: "CZK" },
-            "Malibu": { price: 99, icon: "🍹", stock: 48, currency: "CZK" },
-            "Jack s colou": { price: 99, icon: "🥃", stock: 50, currency: "CZK" },
-            "Moscow Mule": { price: 99, icon: "🍸", stock: 30, currency: "CZK" },
-            "Gin-Tonic": { price: 99, icon: "🍸", stock: 50, currency: "CZK" },
-            "Mojito": { price: 99, icon: "🍹", stock: 30, currency: "CZK" },
-            "Coca-Cola": { price: 32, icon: "🥤", stock: 100, currency: "CZK" },
-            "Sprite": { price: 32, icon: "🥤", stock: 100, currency: "CZK" },
-            "Red Bull": { price: 59, icon: "🪽", stock: 100, currency: "CZK" },
-            "Prosecco": { price: 390, icon: "🍾", stock: 20, currency: "CZK" },
-            "Pivo sud 30 l": { price: 125, icon: "🍺", stock: 10, currency: "EUR" },
-            "Pivo sud 50 l": { price: 175, icon: "🍺", stock: 5, currency: "EUR" },
-            "Plyn": { price: 12, icon: "🔥", stock: 12, currency: "EUR" },
-            "Gril": { price: 20, icon: "🍖", stock: 5, currency: "EUR" }
+            "Budvar": { price: 59, img: "budvar.png", currency: "CZK" },
+            "Malibu": { price: 99, img: "malibu.png", currency: "CZK" },
+            "Jack s colou": { price: 99, img: "jack_cola.png", currency: "CZK" },
+            "Moscow Mule": { price: 99, img: "moscow_mule.png", currency: "CZK" },
+            "Gin-Tonic": { price: 99, img: "gin_tonic.png", currency: "CZK" },
+            "Mojito": { price: 99, img: "mojito.png", currency: "CZK" },
+            "Coca-Cola": { price: 32, img: "coca_cola.png", currency: "CZK" },
+            "Sprite": { price: 32, img: "coca_cola.png", currency: "CZK" },
+            "Red Bull": { price: 59, img: "red_bull.png", currency: "CZK" },
+            "Prosecco": { price: 390, img: "prosecco.png", currency: "CZK" },
+            "Pivo sud 30 l": { price: 125, img: "pivo30.png", currency: "EUR" },
+            "Pivo sud 50 l": { price: 175, img: "pivo50.png", currency: "EUR" },
+            "Plyn": { price: 12, img: "Plyn.png", currency: "EUR" },
+            "Gril": { price: 20, img: "grill.png", currency: "EUR" }
         };
 
+        // Načtení položek
         function loadItems() {
             const container = document.getElementById("items");
             Object.keys(sklad).forEach(itemName => {
                 const item = sklad[itemName];
                 container.innerHTML += `
                     <div class="item">
-                        <span class="item-icon">${item.icon}</span>
-                        <span>${itemName} (${item.stock} ks skladem)</span>
+                        <img src="images/${item.img}" alt="${itemName}">
+                        <span>${itemName} - ${item.price} ${item.currency}</span>
                         <input type="number" id="${itemName}" placeholder="Počet">
                     </div>`;
             });
         }
 
-        function generateInvoice() {
-            // Výpočet faktury
+        // Dynamické přepočítávání
+        function updateInvoice() {
+            let total = 0;
+            Object.keys(sklad).forEach(itemName => {
+                const quantity = document.getElementById(itemName).value || 0;
+                total += quantity * sklad[itemName].price;
+            });
+            document.getElementById("invoice-summary").textContent = `Celková cena: ${total} CZK`;
         }
 
+        document.getElementById("items").addEventListener("input", updateInvoice);
         window.onload = loadItems;
     </script>
 </body>
