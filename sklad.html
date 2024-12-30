@@ -5,22 +5,128 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sklad</title>
     <style>
-        /* Stylování skladu */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            color: #333;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #56ab2f;
+            margin-bottom: 20px;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(135deg, #d4e157, #8bc34a);
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .item input {
+            width: 60px;
+            padding: 5px;
+            font-size: 16px;
+            text-align: center;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #8bc34a, #388e3c);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #76c7a0, #4caf50);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Sklad</h1>
+        <div id="sklad-items"></div>
+        <button onclick="updateStock()">Uložit změny</button>
         <button onclick="clearStorage()">🧹 Smazat Local Storage</button>
         <button onclick="window.location.href='index.html'">Zpět na hlavní stránku</button>
     </div>
     <script>
+        const sklad = JSON.parse(localStorage.getItem("sklad")) || {
+            "Budvar": 50,
+            "Malibu": 48,
+            "Jack s colou": 50,
+            "Moscow Mule": 30,
+            "Gin-Tonic": 50,
+            "Mojito": 30,
+            "Coca-Cola": 100,
+            "Sprite": 100,
+            "Red Bull": 100,
+            "Prosecco": 20,
+            "Pivo sud 30 l": 10,
+            "Pivo sud 50 l": 5,
+            "Plyn": 12,
+            "Gril": 5
+        };
+
+        function loadStock() {
+            const container = document.getElementById("sklad-items");
+            container.innerHTML = "";
+            Object.keys(sklad).forEach(item => {
+                container.innerHTML += `
+                    <div class="item">
+                        <span>${item} (${sklad[item]} ks)</span>
+                        <input type="number" id="${item}-stock" value="${sklad[item]}">
+                    </div>`;
+            });
+        }
+
+        function updateStock() {
+            Object.keys(sklad).forEach(item => {
+                const input = document.getElementById(`${item}-stock`);
+                sklad[item] = parseInt(input.value) || 0;
+            });
+            localStorage.setItem("sklad", JSON.stringify(sklad));
+            alert("Sklad byl aktualizován!");
+        }
+
         function clearStorage() {
             if (confirm("Opravdu chcete smazat všechna data?")) {
                 localStorage.clear();
                 alert("Data byla smazána.");
+                location.reload();
             }
         }
+
+        window.onload = loadStock;
     </script>
 </body>
 </html>
