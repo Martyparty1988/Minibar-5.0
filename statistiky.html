@@ -4,18 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistiky</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Stylování statistik */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #42a5f5, #1e88e5);
+            color: #fff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #1e88e5;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            max-width: 100%;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #1e88e5, #42a5f5);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #2196f3, #64b5f6);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Statistiky</h1>
-        <button onclick="window.location.href='index.html'">Zpět na hlavní stránku</button>
         <canvas id="salesChart"></canvas>
+        <canvas id="topItemsChart"></canvas>
+        <button onclick="window.location.href='index.html'">Zpět na hlavní stránku</button>
     </div>
     <script>
-        /* JavaScript pro grafy */
+        const salesData = [5000, 7000, 4000, 3000, 8000]; // Příklad dat
+        const itemLabels = ["Budvar", "Malibu", "Jack s colou", "Moscow Mule", "Mojito"];
+        const itemData = [100, 50, 70, 30, 40];
+
+        const ctx1 = document.getElementById('salesChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: ["Leden", "Únor", "Březen", "Duben", "Květen"],
+                datasets: [{
+                    label: "Prodeje (€)",
+                    data: salesData,
+                    borderColor: "#42a5f5",
+                    backgroundColor: "rgba(66, 165, 245, 0.4)",
+                    fill: true
+                }]
+            }
+        });
+
+        const ctx2 = document.getElementById('topItemsChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: itemLabels,
+                datasets: [{
+                    label: "Nejprodávanější položky",
+                    data: itemData,
+                    backgroundColor: "rgba(66, 165, 245, 0.6)"
+                }]
+            }
+        });
     </script>
 </body>
 </html>
