@@ -14,7 +14,7 @@
         }
 
         .container {
-            max-width: 480px;
+            max-width: 600px;
             margin: 20px auto;
             background: #fff;
             border-radius: 16px;
@@ -30,62 +30,64 @@
             margin-bottom: 20px;
         }
 
-        .form-group {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            display: flex;
-            flex-direction: column;
-            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .form-group label {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .form-group select, .form-group input {
+        .grid-item {
             width: 100%;
-            padding: 8px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        .item {
-            background: #f4f4f4;
-            padding: 15px;
+            padding-top: 100%; /* Čtvercový tvar */
+            position: relative;
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
             border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
+            justify-content: center;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .item:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        .grid-item:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
         }
 
-        .item img {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            margin-right: 10px;
+        .grid-item img {
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            right: 10%;
+            bottom: 10%;
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
         }
 
-        .item input {
-            width: 60px;
-            padding: 5px;
-            font-size: 16px;
+        .badge {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            background: red;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #invoice-summary {
+            margin-top: 20px;
+            font-weight: bold;
             text-align: center;
-            border-radius: 8px;
-            border: none;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         button {
@@ -108,48 +110,14 @@
             transform: scale(1.05);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
         }
-
-        #invoice-summary {
-            margin-top: 20px;
-            font-weight: bold;
-            text-align: center;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Mini Bar Management</h1>
-        
-        <!-- Formuláře nahoře -->
-        <div class="form-group">
-            <label for="villa">Vyberte vilu:</label>
-            <select id="villa">
-                <option value="ohyeah">🏠 Oh Yeah Villa</option>
-                <option value="castle">🏰 The Little Castle</option>
-                <option value="pool">🏊 Amazing Pool Villa</option>
-            </select>
-        </div>
 
-        <div class="form-group">
-            <label for="currency">Vyberte měnu:</label>
-            <select id="currency">
-                <option value="CZK">CZK</option>
-                <option value="EUR">EUR</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="wellness">Wellness (€):</label>
-            <input type="number" id="wellness" placeholder="Zadejte částku">
-        </div>
-
-        <div class="form-group">
-            <label for="guests">Počet hostů:</label>
-            <input type="number" id="guests" placeholder="Počet hostů">
-        </div>
-
-        <!-- Položky minibaru -->
-        <div id="items"></div>
+        <!-- Grid pro minibar -->
+        <div class="grid" id="items"></div>
 
         <!-- Shrnutí a tlačítka -->
         <div id="invoice-summary">Celková cena: 0 CZK</div>
@@ -166,7 +134,7 @@
             "Gin-Tonic": { price: 99, img: "gin_tonic.png", currency: "CZK" },
             "Mojito": { price: 99, img: "mojito.png", currency: "CZK" },
             "Coca-Cola": { price: 32, img: "coca_cola.png", currency: "CZK" },
-            "Sprite": { price: 32, img: "coca_cola.png", currency: "CZK" },
+            "Sprite": { price: 32, img: "sprite.png", currency: "CZK" },
             "Red Bull": { price: 59, img: "red_bull.png", currency: "CZK" },
             "Prosecco": { price: 390, img: "prosecco.png", currency: "CZK" },
             "Pivo sud 30 l": { price: 125, img: "pivo30.png", currency: "EUR" },
@@ -175,31 +143,43 @@
             "Gril": { price: 20, img: "grill.png", currency: "EUR" }
         };
 
-        // Načtení položek
+        // Načtení položek do mřížky
         function loadItems() {
             const container = document.getElementById("items");
             Object.keys(sklad).forEach(itemName => {
                 const item = sklad[itemName];
                 container.innerHTML += `
-                    <div class="item">
+                    <div class="grid-item" id="${itemName}" onclick="incrementInput('${itemName}')">
                         <img src="images/${item.img}" alt="${itemName}">
-                        <span>${itemName} - ${item.price} ${item.currency}</span>
-                        <input type="number" id="${itemName}" placeholder="Počet">
+                        <div class="badge" id="badge-${itemName}" style="display: none;">0</div>
                     </div>`;
             });
+        }
+
+        // Pseudo-input (inkrementace při kliknutí)
+        const counts = {};
+        function incrementInput(itemName) {
+            counts[itemName] = (counts[itemName] || 0) + 1;
+            updateBadge(itemName);
+            updateInvoice();
+        }
+
+        // Aktualizace bublinky (badge)
+        function updateBadge(itemName) {
+            const badge = document.getElementById(`badge-${itemName}`);
+            badge.style.display = counts[itemName] > 0 ? "flex" : "none";
+            badge.textContent = counts[itemName];
         }
 
         // Dynamické přepočítávání
         function updateInvoice() {
             let total = 0;
-            Object.keys(sklad).forEach(itemName => {
-                const quantity = document.getElementById(itemName).value || 0;
-                total += quantity * sklad[itemName].price;
+            Object.keys(counts).forEach(itemName => {
+                total += counts[itemName] * sklad[itemName].price;
             });
             document.getElementById("invoice-summary").textContent = `Celková cena: ${total} CZK`;
         }
 
-        document.getElementById("items").addEventListener("input", updateInvoice);
         window.onload = loadItems;
     </script>
 </body>
