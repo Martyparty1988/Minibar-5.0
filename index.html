@@ -1,186 +1,136 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini Bar Management</title>
+    <title>POS System</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #ff4e50, #f9d423);
-            color: #333;
+            background-color: #f9f9f9;
         }
-
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            background: #fff;
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        h1 {
-            text-align: center;
-            font-size: 28px;
-            font-weight: bold;
-            color: #ff4e50;
-            margin-bottom: 20px;
-        }
-
-        .grid {
+        .grid-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 20px;
+            padding: 20px;
         }
-
-        .grid-item {
-            width: 100%;
-            padding-top: 100%; /* Čtvercový tvar */
-            position: relative;
-            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .grid-item:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-        }
-
-        .grid-item img {
-            position: absolute;
-            top: 10%;
-            left: 10%;
-            right: 10%;
-            bottom: 10%;
-            width: 80%;
-            height: 80%;
-            object-fit: contain;
-        }
-
-        .badge {
-            position: absolute;
-            top: 10%;
-            right: 10%;
-            background: red;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        #invoice-summary {
-            margin-top: 20px;
-            font-weight: bold;
+        .product-card {
             text-align: center;
-        }
-
-        button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            margin: 20px 0;
-            background: linear-gradient(135deg, #ff4e50, #f9d423);
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 10px;
             cursor: pointer;
-            text-transform: uppercase;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
-
-        button:hover {
-            transform: scale(1.05);
+        .product-card img {
+            max-width: 100px;
+            height: auto;
+            margin: 10px auto;
+        }
+        .product-card:hover {
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            width: 300px;
+        }
+        .modal-content img {
+            max-width: 150px;
+            height: auto;
+        }
+        .modal-content input {
+            margin-top: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+        .modal-content button {
+            margin: 10px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .add-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .cancel-btn {
+            background-color: #dc3545;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Mini Bar Management</h1>
 
-        <!-- Grid pro minibar -->
-        <div class="grid" id="items"></div>
-
-        <!-- Shrnutí a tlačítka -->
-        <div id="invoice-summary">Celková cena: 0 CZK</div>
-        <button onclick="generateInvoice()">Generovat fakturu</button>
+<div class="grid-container">
+    <div class="product-card" onclick="openModal('Jack Daniels', 'jack.png')">
+        <img src="jack.png" alt="Jack Daniels">
+        <p>Jack Daniels</p>
+        <p>99 Kč</p>
     </div>
+    <div class="product-card" onclick="openModal('Mojito', 'mojito.png')">
+        <img src="mojito.png" alt="Mojito">
+        <p>Mojito</p>
+        <p>99 Kč</p>
+    </div>
+    <div class="product-card" onclick="openModal('Budvar', 'budvar.png')">
+        <img src="budvar.png" alt="Budvar">
+        <p>Budvar</p>
+        <p>59 Kč</p>
+    </div>
+    <!-- Add more products as needed -->
+</div>
 
-    <script>
-        // Položky minibaru
-        const sklad = {
-            "Budvar": { price: 59, img: "budvar.png", currency: "CZK" },
-            "Malibu": { price: 99, img: "malibu.png", currency: "CZK" },
-            "Jack s colou": { price: 99, img: "jack_cola.png", currency: "CZK" },
-            "Moscow Mule": { price: 99, img: "moscow_mule.png", currency: "CZK" },
-            "Gin-Tonic": { price: 99, img: "gin_tonic.png", currency: "CZK" },
-            "Mojito": { price: 99, img: "mojito.png", currency: "CZK" },
-            "Coca-Cola": { price: 32, img: "coca_cola.png", currency: "CZK" },
-            "Sprite": { price: 32, img: "sprite.png", currency: "CZK" },
-            "Red Bull": { price: 59, img: "red_bull.png", currency: "CZK" },
-            "Prosecco": { price: 390, img: "prosecco.png", currency: "CZK" },
-            "Pivo sud 30 l": { price: 125, img: "pivo30.png", currency: "EUR" },
-            "Pivo sud 50 l": { price: 175, img: "pivo50.png", currency: "EUR" },
-            "Plyn": { price: 12, img: "Plyn.png", currency: "EUR" },
-            "Gril": { price: 20, img: "grill.png", currency: "EUR" }
-        };
+<div id="productModal" class="modal">
+    <div class="modal-content">
+        <h2 id="productName"></h2>
+        <img id="productImage" src="" alt="Product Image">
+        <input type="number" placeholder="Zadejte množství" id="quantityInput" min="1">
+        <div>
+            <button class="add-btn" onclick="addToCart()">Přidat</button>
+            <button class="cancel-btn" onclick="closeModal()">Zrušit</button>
+        </div>
+    </div>
+</div>
 
-        // Načtení položek do mřížky
-        function loadItems() {
-            const container = document.getElementById("items");
-            Object.keys(sklad).forEach(itemName => {
-                const item = sklad[itemName];
-                container.innerHTML += `
-                    <div class="grid-item" id="${itemName}" onclick="incrementInput('${itemName}')">
-                        <img src="images/${item.img}" alt="${itemName}">
-                        <div class="badge" id="badge-${itemName}" style="display: none;">0</div>
-                    </div>`;
-            });
+<script>
+    function openModal(productName, productImage) {
+        document.getElementById('productName').textContent = productName;
+        document.getElementById('productImage').src = productImage;
+        document.getElementById('productModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('productModal').style.display = 'none';
+    }
+
+    function addToCart() {
+        const quantity = document.getElementById('quantityInput').value;
+        if (quantity > 0) {
+            alert('Přidáno do košíku: ' + quantity + ' ks');
+            closeModal();
+        } else {
+            alert('Zadejte platné množství!');
         }
+    }
+</script>
 
-        // Pseudo-input (inkrementace při kliknutí)
-        const counts = {};
-        function incrementInput(itemName) {
-            counts[itemName] = (counts[itemName] || 0) + 1;
-            updateBadge(itemName);
-            updateInvoice();
-        }
-
-        // Aktualizace bublinky (badge)
-        function updateBadge(itemName) {
-            const badge = document.getElementById(`badge-${itemName}`);
-            badge.style.display = counts[itemName] > 0 ? "flex" : "none";
-            badge.textContent = counts[itemName];
-        }
-
-        // Dynamické přepočítávání
-        function updateInvoice() {
-            let total = 0;
-            Object.keys(counts).forEach(itemName => {
-                total += counts[itemName] * sklad[itemName].price;
-            });
-            document.getElementById("invoice-summary").textContent = `Celková cena: ${total} CZK`;
-        }
-
-        window.onload = loadItems;
-    </script>
 </body>
 </html>
